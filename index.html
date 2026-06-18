@@ -224,8 +224,8 @@
     </main>
   </div>
 
-  <script type="module" src="./assets/app.js"></script>
-  <script type="module" src="./assets/index-CGBgIqBq.js"></script>
+  <script type="module" src="/assets/app.js"></script>
+  <script type="module" src="/src/finance-entry.tsx"></script>
 
   <script>
     // Sidebar navigation
@@ -233,7 +233,7 @@
       link.addEventListener('click', (e) => {
         e.preventDefault();
         const route = link.getAttribute('data-route');
-        window.history.pushState({}, '', '/reshape-dashboards-dev' + route);
+        window.history.pushState({}, '', route);
         window.dispatchEvent(new PopStateEvent('popstate'));
         updateActiveLink();
         document.getElementById('sidebar').classList.remove('open');
@@ -244,12 +244,12 @@
     function updateActiveLink() {
       const path = window.location.pathname;
       document.querySelectorAll('.sidebar-link').forEach(l => {
-        l.classList.toggle('active', '/reshape-dashboards-dev' + l.getAttribute('data-route') === path);
+        l.classList.toggle('active', l.getAttribute('data-route') === path);
       });
       // Toggle finance dashboard visibility
       if (window.__financeToggle) window.__financeToggle();
       // Show/hide back button on member profile
-      toggleBackButton(path === '/reshape-dashboards-dev/member');
+      toggleBackButton(path === '/member');
     }
 
     // Back button for member profile page — injected into .content-area above #content
@@ -304,7 +304,7 @@
       if (text === 'View Full Profile') {
         e.preventDefault();
         e.stopPropagation();
-        window.history.pushState({}, '', '/reshape-dashboards-dev/member');
+        window.history.pushState({}, '', '/member');
         window.dispatchEvent(new PopStateEvent('popstate'));
         updateActiveLink();
         return;
@@ -324,7 +324,7 @@
         // Looks like a member name link
         e.preventDefault();
         e.stopPropagation();
-        window.history.pushState({}, '', '/reshape-dashboards-dev/member');
+        window.history.pushState({}, '', '/member');
         window.dispatchEvent(new PopStateEvent('popstate'));
         updateActiveLink();
         // Scroll to top of content area
