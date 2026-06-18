@@ -26,10 +26,40 @@
       flex-direction: column;
       overflow-y: auto;
       z-index: 100;
+      transition: width 0.2s ease, min-width 0.2s ease;
     }
+    .sidebar.collapsed {
+      width: 64px;
+      min-width: 64px;
+    }
+    .sidebar.collapsed .sidebar-logo p,
+    .sidebar.collapsed .sidebar-link span,
+    .sidebar.collapsed .sidebar-section,
+    .sidebar.collapsed .sidebar-footer-name,
+    .sidebar.collapsed .sidebar-footer-role {
+      display: none;
+    }
+    .sidebar.collapsed .sidebar-logo { padding: 16px 12px; text-align: center; }
+    .sidebar.collapsed .sidebar-logo h1 { font-size: 14px; }
+    .sidebar.collapsed .sidebar-nav { padding: 8px 6px; }
+    .sidebar.collapsed .sidebar-link { padding: 10px 0; justify-content: center; gap: 0; }
+    .sidebar.collapsed .sidebar-link .icon { width: 36px; height: 36px; }
+    .sidebar.collapsed .sidebar-footer { padding: 12px 8px; }
+    .sidebar.collapsed .sidebar-footer-user { justify-content: center; }
+    .sidebar.collapsed .sidebar-footer-avatar { width: 36px; height: 36px; }
+    .sidebar-collapse-btn {
+      width: 24px; height: 24px; border-radius: 6px;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+      color: #64748B; font-size: 12px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s;
+      position: absolute; top: 24px; right: -12px; z-index: 101;
+    }
+    .sidebar-collapse-btn:hover { background: rgba(237,92,37,0.15); color: #ED5C25; border-color: rgba(237,92,37,0.3); }
     .sidebar-logo {
       padding: 24px 20px 20px;
       border-bottom: 1px solid rgba(255,255,255,0.06);
+      position: relative;
     }
     .sidebar-logo h1 {
       font-size: 18px;
@@ -179,33 +209,34 @@
       <div class="sidebar-logo">
         <h1>Re<span>Shape</span></h1>
         <p>Method Dashboards</p>
+        <button class="sidebar-collapse-btn" id="collapseBtn" title="Collapse sidebar">&#9664;</button>
       </div>
       <nav class="sidebar-nav">
         <div class="sidebar-section">Dashboards</div>
-        <a class="sidebar-link" data-route="/admin" href="/admin">
+        <a class="sidebar-link" data-route="/dashboards/admin" href="/dashboards/admin">
           <div class="icon">&#128736;</div>
-          Admin Console
+          <span>Admin Console</span>
         </a>
-        <a class="sidebar-link" data-route="/coach" href="/coach">
+        <a class="sidebar-link" data-route="/dashboards/coach" href="/dashboards/coach">
           <div class="icon">&#127947;</div>
-          Coach
+          <span>Coach</span>
         </a>
-        <a class="sidebar-link" data-route="/headcoach" href="/headcoach">
+        <a class="sidebar-link" data-route="/dashboards/headcoach" href="/dashboards/headcoach">
           <div class="icon">&#11088;</div>
-          Head Coach
+          <span>Head Coach</span>
         </a>
-        <a class="sidebar-link" data-route="/ops" href="/ops">
+        <a class="sidebar-link" data-route="/dashboards/ops" href="/dashboards/ops">
           <div class="icon">&#9881;</div>
-          Ops Centre
+          <span>Ops Centre</span>
         </a>
-        <a class="sidebar-link" data-route="/finance" href="/finance">
+        <a class="sidebar-link" data-route="/dashboards/finance" href="/dashboards/finance">
           <div class="icon">&#128176;</div>
-          Finance
+          <span>Finance</span>
         </a>
         <div class="sidebar-section">System</div>
-        <a class="sidebar-link" data-route="/settings" href="/settings">
+        <a class="sidebar-link" data-route="/dashboards/settings" href="/dashboards/settings">
           <div class="icon">&#9881;</div>
-          Settings
+          <span>Settings</span>
         </a>
       </nav>
       <div class="sidebar-footer">
@@ -224,8 +255,8 @@
     </main>
   </div>
 
-  <script type="module" src="/assets/app.js"></script>
-  <script type="module" src="/src/finance-entry.tsx"></script>
+  <script type="module" src="/dashboards/assets/app.js"></script>
+  <script type="module" src="/dashboards/assets/index-CGBgIqBq.js"></script>
 
   <script>
     // Sidebar navigation
@@ -249,7 +280,7 @@
       // Toggle finance dashboard visibility
       if (window.__financeToggle) window.__financeToggle();
       // Show/hide back button on member profile
-      toggleBackButton(path === '/member');
+      toggleBackButton(path === '/dashboards/member');
     }
 
     // Back button for member profile page — injected into .content-area above #content
@@ -284,6 +315,20 @@
     window.addEventListener('popstate', updateActiveLink);
     updateActiveLink();
 
+    // Collapse sidebar toggle
+    document.getElementById('collapseBtn').addEventListener('click', () => {
+      const sb = document.getElementById('sidebar');
+      const btn = document.getElementById('collapseBtn');
+      sb.classList.toggle('collapsed');
+      btn.innerHTML = sb.classList.contains('collapsed') ? '&#9654;' : '&#9664;';
+      localStorage.setItem('sidebar-collapsed', sb.classList.contains('collapsed'));
+    });
+    // Restore collapsed state
+    if (localStorage.getItem('sidebar-collapsed') === 'true') {
+      document.getElementById('sidebar').classList.add('collapsed');
+      document.getElementById('collapseBtn').innerHTML = '&#9654;';
+    }
+
     document.getElementById('sidebarToggle').addEventListener('click', () => {
       document.getElementById('sidebar').classList.toggle('open');
       document.getElementById('sidebarOverlay').classList.toggle('open');
@@ -304,7 +349,7 @@
       if (text === 'View Full Profile') {
         e.preventDefault();
         e.stopPropagation();
-        window.history.pushState({}, '', '/member');
+        window.history.pushState({}, '', '/dashboards/member');
         window.dispatchEvent(new PopStateEvent('popstate'));
         updateActiveLink();
         return;
@@ -324,7 +369,7 @@
         // Looks like a member name link
         e.preventDefault();
         e.stopPropagation();
-        window.history.pushState({}, '', '/member');
+        window.history.pushState({}, '', '/dashboards/member');
         window.dispatchEvent(new PopStateEvent('popstate'));
         updateActiveLink();
         // Scroll to top of content area
