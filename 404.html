@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ReShape Method Dashboards</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800;9..40,900&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; background: #08090E; font-family: 'DM Sans', system-ui, sans-serif; color: #E2E8F0; }
+
+    .app-layout {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 240px;
+      min-width: 240px;
+      background: #0D0F16;
+      border-right: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      z-index: 100;
+    }
+    .sidebar-logo {
+      padding: 24px 20px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .sidebar-logo h1 {
+      font-size: 18px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.5px;
+    }
+    .sidebar-logo h1 span { color: #ED5C25; }
+    .sidebar-logo p {
+      font-size: 11px;
+      color: #64748B;
+      margin-top: 2px;
+      font-weight: 500;
+    }
+
+    .sidebar-nav {
+      padding: 12px 10px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .sidebar-section {
+      font-size: 10px;
+      font-weight: 700;
+      color: #64748B;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 16px 10px 6px;
+    }
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #94A3B8;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-decoration: none;
+      border: 1px solid transparent;
+    }
+    .sidebar-link:hover {
+      background: rgba(255,255,255,0.04);
+      color: #E2E8F0;
+    }
+    .sidebar-link.active {
+      background: rgba(237,92,37,0.1);
+      color: #ED5C25;
+      border-color: rgba(237,92,37,0.2);
+    }
+    .sidebar-link .icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      background: rgba(255,255,255,0.04);
+      flex-shrink: 0;
+    }
+    .sidebar-link.active .icon {
+      background: rgba(237,92,37,0.15);
+    }
+
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .sidebar-footer-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .sidebar-footer-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #ED5C25, #F59E0B);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 800;
+      color: #fff;
+    }
+    .sidebar-footer-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: #E2E8F0;
+    }
+    .sidebar-footer-role {
+      font-size: 11px;
+      color: #64748B;
+      font-weight: 500;
+    }
+
+    /* Content */
+    .content-area {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+    #content { height: 100%; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+
+    /* Mobile */
+    .sidebar-toggle {
+      display: none;
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      z-index: 200;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: #0D0F16;
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #E2E8F0;
+      font-size: 18px;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+    }
+    .sidebar-overlay { display: none; }
+    @media (max-width: 768px) {
+      .sidebar { position: fixed; left: -260px; top: 0; bottom: 0; transition: left 0.25s ease; z-index: 150; }
+      .sidebar.open { left: 0; }
+      .sidebar-toggle { display: flex; }
+      .sidebar-overlay.open { display: block; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 140; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <button class="sidebar-toggle" id="sidebarToggle">&#9776;</button>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <h1>Re<span>Shape</span></h1>
+        <p>Method Dashboards</p>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section">Dashboards</div>
+        <a class="sidebar-link" data-route="/admin" href="/admin">
+          <div class="icon">&#128736;</div>
+          Admin Console
+        </a>
+        <a class="sidebar-link" data-route="/coach" href="/coach">
+          <div class="icon">&#127947;</div>
+          Coach
+        </a>
+        <a class="sidebar-link" data-route="/headcoach" href="/headcoach">
+          <div class="icon">&#11088;</div>
+          Head Coach
+        </a>
+        <a class="sidebar-link" data-route="/ops" href="/ops">
+          <div class="icon">&#9881;</div>
+          Ops Centre
+        </a>
+        <a class="sidebar-link" data-route="/finance" href="/finance">
+          <div class="icon">&#128176;</div>
+          Finance
+        </a>
+        <div class="sidebar-section">System</div>
+        <a class="sidebar-link" data-route="/settings" href="/settings">
+          <div class="icon">&#9881;</div>
+          Settings
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="sidebar-footer-user">
+          <div class="sidebar-footer-avatar">LA</div>
+          <div>
+            <div class="sidebar-footer-name">Loai Al-Amri</div>
+            <div class="sidebar-footer-role">Director</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="content-area">
+      <div id="content"></div>
+    </main>
+  </div>
+
+  <script type="module" src="/assets/app.js"></script>
+  <script type="module" src="/src/finance-entry.tsx"></script>
+
+  <script>
+    // Sidebar navigation
+    document.querySelectorAll('.sidebar-link').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const route = link.getAttribute('data-route');
+        window.history.pushState({}, '', route);
+        window.dispatchEvent(new PopStateEvent('popstate'));
+        updateActiveLink();
+        document.getElementById('sidebar').classList.remove('open');
+        document.getElementById('sidebarOverlay').classList.remove('open');
+      });
+    });
+
+    function updateActiveLink() {
+      const path = window.location.pathname;
+      document.querySelectorAll('.sidebar-link').forEach(l => {
+        l.classList.toggle('active', l.getAttribute('data-route') === path);
+      });
+      // Toggle finance dashboard visibility
+      if (window.__financeToggle) window.__financeToggle();
+      // Show/hide back button on member profile
+      toggleBackButton(path === '/member');
+    }
+
+    // Back button for member profile page — injected into .content-area above #content
+    function toggleBackButton(show) {
+      let bar = document.getElementById('back-bar');
+      if (show && !bar) {
+        bar = document.createElement('div');
+        bar.id = 'back-bar';
+        Object.assign(bar.style, {
+          padding: '10px 20px', background: '#0D0F16',
+          borderBottom: '1px solid rgba(255,255,255,0.06)',
+          display: 'flex', alignItems: 'center', flexShrink: '0',
+        });
+        const btn = document.createElement('button');
+        btn.innerHTML = '&#8592;&nbsp; Back to Dashboard';
+        Object.assign(btn.style, {
+          padding: '6px 14px', borderRadius: '6px', border: 'none',
+          background: 'rgba(255,255,255,0.06)', color: '#94A3B8', fontSize: '12px', fontWeight: '600',
+          cursor: 'pointer', fontFamily: "'DM Sans', system-ui, sans-serif",
+        });
+        btn.addEventListener('click', () => window.history.back());
+        btn.addEventListener('mouseenter', () => { btn.style.background = 'rgba(237,92,37,0.15)'; btn.style.color = '#ED5C25'; });
+        btn.addEventListener('mouseleave', () => { btn.style.background = 'rgba(255,255,255,0.06)'; btn.style.color = '#94A3B8'; });
+        bar.appendChild(btn);
+        const area = document.querySelector('.content-area');
+        if (area) area.insertBefore(bar, area.firstChild);
+      } else if (!show && bar) {
+        bar.remove();
+      }
+    }
+
+    window.addEventListener('popstate', updateActiveLink);
+    updateActiveLink();
+
+    document.getElementById('sidebarToggle').addEventListener('click', () => {
+      document.getElementById('sidebar').classList.toggle('open');
+      document.getElementById('sidebarOverlay').classList.toggle('open');
+    });
+    document.getElementById('sidebarOverlay').addEventListener('click', () => {
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('sidebarOverlay').classList.remove('open');
+    });
+
+
+    // Intercept member name clicks and "View Full Profile" to navigate to /member
+    document.addEventListener('click', (e) => {
+      const el = e.target;
+      if (!el) return;
+      const text = (el.textContent || '').trim();
+
+      // "View Full Profile" buttons
+      if (text === 'View Full Profile') {
+        e.preventDefault();
+        e.stopPropagation();
+        window.history.pushState({}, '', '/member');
+        window.dispatchEvent(new PopStateEvent('popstate'));
+        updateActiveLink();
+        return;
+      }
+
+      // Member name links (orange underlined spans with cursor:pointer)
+      const style = window.getComputedStyle(el);
+      if (
+        el.tagName === 'SPAN' &&
+        style.textDecoration.includes('underline') &&
+        style.cursor === 'pointer' &&
+        text.length > 3 &&
+        text.includes(' ') &&
+        !text.includes('·') &&
+        !text.includes('%')
+      ) {
+        // Looks like a member name link
+        e.preventDefault();
+        e.stopPropagation();
+        window.history.pushState({}, '', '/member');
+        window.dispatchEvent(new PopStateEvent('popstate'));
+        updateActiveLink();
+        // Scroll to top of content area
+        document.querySelector('.content-area').scrollTop = 0;
+      }
+    }, true);
+  </script>
+</body>
+</html>
